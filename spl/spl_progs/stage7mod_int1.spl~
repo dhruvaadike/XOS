@@ -1,0 +1,53 @@
+alias phySP S0;
+phySP = ([PTBR + 2*(SP/512)] * 512) + (SP % 512);
+alias syscall S1;
+syscall = [phySP-1];
+alias filename S2;   
+filename = [phySP-3];
+if(syscall==1) then 
+   alias bscblk S3;
+   bscblk=512*6+20;
+   
+   alias fatentry S4;
+   fatentry=FAT;   
+   while(fatentry < DISK_LIST && [fatentry] != filename) do
+      fatentry=fatentry+8;
+   endwhile;
+   if(fatentry!=DISK_LIST) then
+      [phySP-2]=0;   //file already exists (success)
+   else
+      while([bscblk]!=0 && bscblk<=3519) do
+         bscblk=bscblk+1;
+      endwhile;
+      if(bscblk==3520) then    
+	  [phySP-2]=-1;   //failure          
+	  ireturn;
+      fatentry=FAT;
+      while(fatentry < DISK_LIST && [fatentry+2]!=-1) do
+         fatentry=fatentry+8;
+      endwhile;
+      if(fatentry== DISK_LIST) then
+         [phySP-2]=-1;   //failure as no basic blocks are available 
+      else
+         [fatentry]=filename;
+         [fatentry+1]=0;
+         [fatentry+2]=bscblk-3072;
+         load(1,bscblk-3072);
+         alias SPad S6;
+         SPad=SCRATCHPAD;
+         while(SPad < SCRATCHPAD+256) do
+            [SPad] = -1;
+            SPad=SPad+1;
+         endwhile;
+         [bscblk]=1;
+         store(1,bscblk-3072);
+         store(5,19);
+         store(6,20);
+         [phySP-2]=0;   //success
+      endif;
+   endif;
+endif;
+endif;
+ireturn;
+
+

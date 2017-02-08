@@ -1,0 +1,23 @@
+integer main()
+{
+	integer i,j,pid;
+	i=0;
+	while(i<20) do
+		print(i);
+		i=i+2;
+		endwhile;
+	
+	j=Fork();
+	if(j!=-2) then
+                print(4);
+		Exit();
+		
+		
+	
+	else
+               Exit();
+		print(2);
+		
+	endif;
+	return 0;
+}

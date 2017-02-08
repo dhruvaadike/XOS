@@ -1,0 +1,6 @@
+integer main(){
+ integer status;
+ status = Create("stage7.dat");
+ print(status);
+ return 0;
+}

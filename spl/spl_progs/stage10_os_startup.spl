@@ -1,0 +1,92 @@
+load(7,1);//exception
+load(8,2);
+load(23,17);
+load(24,18);
+[READY_LIST + 0] = 0;
+[READY_LIST + 31] =0;
+//load(25,21); //not loading init code
+//load(26,22); 
+//load(27,23);
+PTBR = 1024;
+PTLR = 4; 
+[PTBR + 0] = 21; 
+[PTBR + 1] = "00";
+[PTBR + 2] = 22; 
+[PTBR + 3] = "00";
+[PTBR + 4] = 23; 
+[PTBR + 5] = "00";
+[PTBR + 6] = 28; 
+[PTBR + 7] = "01";
+[READY_LIST + 1] = 2;
+SP = 3 * 512; 
+[28*512]=0;
+load (11, 5);//int1
+load (12, 6);
+load (9, 3);//timer
+load (10, 4);
+load(5,19);//fat
+load(6,20);//diskfree
+
+load(13,7);//int2
+load(14,8);
+load(15,9);//int3
+load(16,10);
+load(17,11);//int4
+load(18,12);
+load(19,13);//int5
+load(20,14);
+load(21,15);//int6
+load(22,16);
+load(23,17);//int7
+load(24,18);
+
+
+alias counter S0;			
+counter = 0;
+
+while (counter<=28) do
+   [MEM_LIST + counter] = 1;
+   counter=counter + 1;
+endwhile;
+
+while (counter<=63) do
+   [MEM_LIST + counter] = 0;
+   counter=counter+1;
+endwhile;
+
+[MEM_LIST + 25] = 0;
+[MEM_LIST + 26] = 0;
+[MEM_LIST + 27] = 0;
+
+//setting states of all processes other than init as free
+counter=1;
+while (counter<32) do
+   [READY_LIST + 32*counter +1]=0;
+   counter=counter+1;
+endwhile;
+
+counter=0;
+
+while ( counter <  128) do			
+   [ FILE_TABLE + counter] = -1; 
+   [ FILE_TABLE + counter + 1] =  0;	
+   counter = counter + 2;			
+endwhile;
+
+counter = 15;
+while(counter<31) do
+   [READY_LIST + counter ] = -1;
+   [READY_LIST + counter + 1 ] = -1 ; 
+   counter = counter + 2;
+endwhile;
+//swap area unused
+counter = 448;
+while(counter<=511) do
+	[DISK_LIST + counter] = 0;
+	counter = counter + 1;	
+endwhile;					
+
+store(6,20);
+
+ireturn;
+
